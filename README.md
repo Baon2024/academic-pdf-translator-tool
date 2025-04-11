@@ -12,4 +12,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 in order to translate pdfs, you need to open another terminal and cd src, cd backend, then: uvicorn server:app --reload --host 127.0.0.1 --port 3001
 
-
+add a .env file in the /backend folder, with your HF api token, in the format: HF_TOKEN=xxxxxxxx
