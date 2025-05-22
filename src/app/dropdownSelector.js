@@ -7,6 +7,7 @@ const MultiSelectDropdown = ({ selectedOptions, setSelectedOptions }) => {
     { value: "german", label: "German" },
     { value: "french", label: "French" },
     { value: "italian", label: "Italian" },
+    { value: "latin", label: "latin"}
   ]
 
   const handleChange = (selected) => {

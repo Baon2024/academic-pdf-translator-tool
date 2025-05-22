@@ -57,6 +57,8 @@ app.post("/translate-pdf", upload.single("pdf"), async (req, res) => {
      
     if (chosenLanguage === 'german') {
       modelUrl = "https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-de-en";
+    } else if (chosenLanguage === 'latin') {
+      modelUrl = 'https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-la-en';
     } else if (chosenLanguage === 'italian') {
       modelUrl = "https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-it-en";
     } else if (chosenLanguage === 'french') {

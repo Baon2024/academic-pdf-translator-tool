@@ -7,6 +7,7 @@ import os
 import requests
 from typing import List
 from dotenv import load_dotenv
+from transformers import pipeline
 
 ##from backend_functions import translate_text, chunk_text  # Replicates your Node.js helpers
 
@@ -46,6 +47,16 @@ def translate_text(text, model_url, api_key):
     response.raise_for_status()
     translated = response.json()
     return translated[0]["translation_text"] if isinstance(translated, list) else translated
+
+
+def translate_text2(text, model_url, api_key):
+    translator = pipeline("translation_de_to_en", model="Helsinki-NLP/opus-mt-de-en")#250m parameter model
+    translated = translator(text)
+    #print("text from translate_text2 is: " + str(translated))
+    translated_text = [item['translation_text'] for item in translated]
+    print("value of translated text before returning is:" + str(translated_text))
+    return translated_text
+
 
 def chunk_text(text, max_length=500):
     words = text.split()
@@ -93,7 +104,7 @@ async def translate_pdf(pdf: UploadFile = File(...), language: str = Form(...)):
         #print("API_KEY is:" + str(API_KEY))
 
         model_url = {
-            "german": "https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-de-en",
+            "german": "https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-de-en", # replace with dict of arguments for relevant params
             "italian": "https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-it-en",
             "french": "https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-fr-en"
         }.get(chosen_language)
@@ -105,15 +116,19 @@ async def translate_pdf(pdf: UploadFile = File(...), language: str = Form(...)):
         translated_chunks = []
         text_chunks = chunk_text(cleaned_text)
 
-        for chunk in text_chunks:
+        for index, chunk in enumerate(text_chunks): #add index to allow tracking how far through translation process is??
              try:
-                 translated = translate_text(chunk, model_url, api_key)
-                 translated_chunks.append(translated)
-                 print("✅ Translated chunk:", translated)
+                 translated = translate_text2(chunk, model_url, api_key) #translate_text(chunk, model_url, api_key)
+                 stringified_chunk = translated[0]
+                 print("✅value of stringified_chunk is: " + str(stringified_chunk))
+                 print("Progress Percentage is: " + str((index / len(text_chunks) * 100))) #- don't even need to pass index to function!!
+                 translated_chunks.append(stringified_chunk)
+                 #print("✅ Translated chunk:", translated)
              except Exception as e:
                  print("❌ Failed to translate chunk:", e)
                  translated_chunks.append("[Translation Error]")
 
+        print("translated_chunks about to be returned: " + str(translated_chunks))
         return {"translatedText": " ".join(translated_chunks)}
 
     except Exception as e:
@@ -122,4 +137,4 @@ async def translate_pdf(pdf: UploadFile = File(...), language: str = Form(...)):
         os.remove(file_path)
 
 # cd src, cd backend, then to start server: uvicorn server:app --reload
-# or to specify localhost: uvicorn server:app --reload --host 127.0.0.1 --port 3001
+# or to specify localhost: uvicorn server:app --reload --host 127.0.0.1 --port 3003

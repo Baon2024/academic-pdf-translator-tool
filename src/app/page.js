@@ -98,7 +98,7 @@ export default function Home() {
       //const objectToPass = { formData: formData, language: selectedOptions}
 
       // Make a POST request to your backend
-      const response = await fetch("http://localhost:3001/translate-pdf-python", {
+      const response = await fetch("http://localhost:3003/translate-pdf-python", {
         method: "POST",
         body: formData, // Pass the FormData directly - I also want to be able to pass the decoding language choice
       });
@@ -132,6 +132,29 @@ export default function Home() {
     const lines = doc.splitTextToSize(translatedText, 180);
     doc.text(lines, 10, 10); // (text, x, y)
 
+    doc.save("translated_text.pdf");
+  }
+
+  async function downloadTranslationHandler2() {
+    console.log("downloadtransaltionahdnelr2 activated!")
+    const doc = new jsPDF();
+    const marginLeft = 10;
+    const marginTop = 10;
+    const lineHeight = 10;
+    const pageHeight = doc.internal.pageSize.height;
+    const lines = doc.splitTextToSize(translatedText, 180);
+  
+    let cursorY = marginTop;
+  
+    for (let i = 0; i < lines.length; i++) {
+      if (cursorY + lineHeight > pageHeight - marginTop) {
+        doc.addPage();
+        cursorY = marginTop;
+      }
+      doc.text(lines[i], marginLeft, cursorY);
+      cursorY += lineHeight;
+    }
+  
     doc.save("translated_text.pdf");
   }
 
@@ -225,7 +248,7 @@ export default function Home() {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xl">Translation Results</CardTitle>
                 <Button
-                  onClick={downloadTranslationHandler}
+                  onClick={downloadTranslationHandler2}
                   variant="outline"
                   size="sm"
                   className="flex items-center gap-1"
