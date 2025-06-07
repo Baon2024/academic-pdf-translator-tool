@@ -101,8 +101,9 @@ app.post("/translate-pdf", upload.single("pdf"), async (req, res) => {
       console.log("task before translation is: ", task, "and modelUrl is: ", modelUrl);
 
 
-      for (const chunk of textChunks) {
-        console.log("sending each chunk to gradio space for translation!")
+      for (let idx = 0; idx < textChunks.length; idx++) {
+        let chunk = textChunks[idx];
+        console.log(`sending chunk ${idx} to gradio space for translation!`)
         //add in new code for js pipeline
         //task, modelUrl
         const client = await Client.connect("http://127.0.0.1:7861/");
@@ -118,17 +119,17 @@ app.post("/translate-pdf", upload.single("pdf"), async (req, res) => {
 
         translatedChunks.push(result.data);
 
-        //const translatedText = await translateText(chunk, modelUrl, apiKey);
-        //console.log("translatedText:", translateText);
-        //translatedChunks.push(translatedText);
-      }
+
+
+      } 
       console.log("translatedChunks are:", translatedChunks);
 
       res.json({
         translatedText: translatedChunks.join(' '),
       });
-    } catch (error) {
-      res.status(500).json({ error: 'Translation failed' });
+    } catch (err) {
+      console.error("❌ Translation error:", err);  // full error log
+      return res.status(500).json({ error: "translation failed", details: err.message || err });
     }
   });
 
