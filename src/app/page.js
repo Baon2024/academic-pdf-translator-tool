@@ -51,7 +51,7 @@ export default function Home() {
       //const objectToPass = { formData: formData, language: selectedOptions}
 
       // Make a POST request to your backend
-      const response = await fetch("http://localhost:3001/translate-pdf", {
+      const response = await fetch("http://localhost:5005/translate-pdf", {
         method: "POST",
         body: formData, // Pass the FormData directly - I also want to be able to pass the decoding language choice
       });
