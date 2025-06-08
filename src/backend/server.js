@@ -128,7 +128,7 @@ app.post("/translate-pdf", upload.single("pdf"), async (req, res) => {
         res.flush()
         //add in new code for js pipeline
         //task, modelUrl
-        const client = await Client.connect("https://85bb0cc6da80f1fb23.gradio.live/");
+        const client = await Client.connect("Baon2024/academic-translation");
         const result = await client.predict("/predict", { 		
           task: task, 		
           modelUrl: modelUrl, 		
