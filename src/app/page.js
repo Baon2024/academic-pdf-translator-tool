@@ -62,13 +62,44 @@ export default function Home() {
         throw new Error("Failed to translate the PDF");
       }
       
-      console.log("response is:", response);
+      //console.log("response is:", response);
       // Parse the response as JSON
-      const data = await response.json();
-      console.log("data returned to frontend is:", data);
+      //const data = await response.json();
+      //console.log("data returned to frontend is:", data);
+      
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder('utf-8');
+
+    if (!reader) return;
+    
+    let partialChunk = ""
+    while (true) {
+      const { value, done } = await reader.read();
+        if (done) break;
+  
+        const chunk = decoder.decode(value, { stream: true });
+        partialChunk += chunk;
+  
+        const lines = partialChunk.split('\n\n');
+        partialChunk = lines.pop();
+
+        for (const line of lines) {
+          console.log("Received line:", JSON.stringify(line));
+        if (line.startsWith("update:")) {
+          const json = line.replace('update:', '');
+          console.log("update is: ", json);
+          alert(json);
+        } else if (line.startsWith('translation:')) {
+          console.log("translation being returned!!")
+          const jsonString = line.replace('translation:', '')
+          console.log("data for translation is: ", jsonString);
+          setTranslatedText(jsonString)
+        }
+      }
+    }
   
       // Update the translated text state
-      setTranslatedText(data.translatedText);
+      //setTranslatedText(data.translatedText);
     } catch (err) {
       setError("Failed to translate the PDF. Please try again.");
       console.error(err);
